@@ -7,12 +7,13 @@ class App extends Component {
     super(props);
     this.state = {
       viewCompleted: false,
-      todoList: [],
+      bookingList: [],
       modal: false,
       activeItem: {
-        title: "",
-        description: "",
-        completed: false,
+        rest_name: "",
+        date: "",
+        number_of_guests: "",
+        booking_confirm: false,
       },
     };
   }
@@ -23,8 +24,8 @@ class App extends Component {
 
   refreshList = () => {
     axios
-      .get("/api/todos/")
-      .then((res) => this.setState({ todoList: res.data }))
+      .get("/api/booking_page/")
+      .then((res) => this.setState({ bookingList: res.data }))
       .catch((err) => console.log(err));
   };
 
@@ -37,23 +38,23 @@ class App extends Component {
 
     if (item.id) {
       axios
-        .put(`/api/todos/${item.id}/`, item)
+        .put(`/api/booking_page/${item.id}/`, item)
         .then((res) => this.refreshList());
       return;
     }
     axios
-      .post("/api/todos/", item)
+      .post("/api/booking_page/", item)
       .then((res) => this.refreshList());
   };
 
   handleDelete = (item) => {
     axios
-      .delete(`/api/todos/${item.id}/`)
+      .delete(`/api/booking_page/${item.id}/`)
       .then((res) => this.refreshList());
   };
 
   createItem = () => {
-    const item = { title: "", description: "", completed: false };
+    const item = { rest_name: "", date: "", number_of_guests: "", booking_confirm: ""};
 
     this.setState({ activeItem: item, modal: !this.state.modal });
   };
@@ -77,13 +78,13 @@ class App extends Component {
           onClick={() => this.displayCompleted(true)}
           className={this.state.viewCompleted ? "nav-link active" : "nav-link"}
         >
-          Complete
+          Confirm
         </span>
         <span
           onClick={() => this.displayCompleted(false)}
           className={this.state.viewCompleted ? "nav-link" : "nav-link active"}
         >
-          Incomplete
+          Pending
         </span>
       </div>
     );
@@ -91,8 +92,8 @@ class App extends Component {
 
   renderItems = () => {
     const { viewCompleted } = this.state;
-    const newItems = this.state.todoList.filter(
-      (item) => item.completed === viewCompleted
+    const newItems = this.state.bookingList.filter(
+      (item) => item.booking_confirm === viewCompleted
     );
 
     return newItems.map((item) => (
@@ -101,11 +102,11 @@ class App extends Component {
         className="list-group-item d-flex justify-content-between align-items-center"
       >
         <span
-          className={`todo-title mr-2 ${this.state.viewCompleted ? "completed-todo" : ""
+          className={`todo-title mr-2 ${this.state.viewCompleted ? "completed-booking" : ""
             }`}
-          title={item.description}
+          title={item.rest_name}
         >
-          {item.title}
+          {item.rest_name}
         </span>
         <span>
           <button
@@ -128,7 +129,7 @@ class App extends Component {
   render() {
     return (
       <main className="container">
-        <h1 className="text-white text-uppercase text-center my-4">Todo app</h1>
+        <h1 className="text-white text-uppercase text-center my-4">Resy Reservation app</h1>
         <div className="row">
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
@@ -137,7 +138,7 @@ class App extends Component {
                   className="btn btn-primary"
                   onClick={this.createItem}
                 >
-                  Add task
+                  Create Booking
                 </button>
               </div>
               {this.renderTabList()}
